@@ -493,7 +493,7 @@ def ThresholdPanelLPX(
 # newey_lags = max lags for Newey-West HAC SEs
 # ci_width = float within (0, 1) indicating the width of the confidence band (e.g., 0.95 for 95% CI)
 def ThresholdTimeSeriesLPX(
-    data, Y, X, threshold_var, response, horizon, lags, newey_lags=4, ci_width=0.95
+    data, Y, X, threshold_var, response, horizon, lags, newey_lags="horizon", ci_width=0.95
 ):
     ## Illegal inputs
     if (ci_width >= 1) | (ci_width <= 0):
@@ -537,6 +537,7 @@ def ThresholdTimeSeriesLPX(
         r_loc = Y.index(r)
         ## Generate copy of data for horizon h + first difference RHS variables + transform response variable to desired horizon
         for h in range(horizon + 1):
+            nw_lags = h if newey_lags == "horizon" else newey_lags
             d = data.copy()
             d[r + "forward"] = d[r].shift(-h) - d[r].shift(
                 1
@@ -627,9 +628,9 @@ def ThresholdTimeSeriesLPX(
             )  # own-shock model includes contemp first diff dependent
             mod = smf.ols(eqn, data=d)
             mod_ownshock = smf.ols(eqn_ownshock, data=d)  # own-shock model
-            est = mod.fit(cov_type="HAC", cov_kwds={"maxlags": newey_lags})
+            est = mod.fit(cov_type="HAC", cov_kwds={"maxlags": nw_lags})
             est_ownshock = mod_ownshock.fit(
-                cov_type="HAC", cov_kwds={"maxlags": newey_lags}
+                cov_type="HAC", cov_kwds={"maxlags": nw_lags}
             )  # own-shock model
             beta = est.params
             beta_ownshock = est_ownshock.params  # own-shock model
@@ -695,7 +696,7 @@ def ThresholdTimeSeriesLPX(
 # lags = integer indicating number of lags to be used in the estimation models (e.g., 4 for 4 lags)
 # newey_lags = max lags for Newey-West HAC SEs
 # ci_width = float within (0, 1) indicating the width of the confidence band (e.g., 0.95 for 95% CI)
-def TimeSeriesLP(data, Y, response, horizon, lags, newey_lags=4, ci_width=0.95):
+def TimeSeriesLP(data, Y, response, horizon, lags, newey_lags="horizon", ci_width=0.95):
     ## Illegal inputs
     if (ci_width >= 1) | (ci_width <= 0):
         raise NotImplementedError("CI Width must be within (0, 1), non-inclusive!")
@@ -723,6 +724,7 @@ def TimeSeriesLP(data, Y, response, horizon, lags, newey_lags=4, ci_width=0.95):
         r_loc = Y.index(r)
         ## Generate copy of data for horizon h + first difference RHS variables + transform response variable to desired horizon
         for h in range(horizon + 1):
+            nw_lags = h if newey_lags == "horizon" else newey_lags
             d = data.copy()
             d[r + "forward"] = d[r].shift(-h) - d[r].shift(
                 1
@@ -767,9 +769,9 @@ def TimeSeriesLP(data, Y, response, horizon, lags, newey_lags=4, ci_width=0.95):
             )  # own-shock model includes contemp first diff dependent
             mod = smf.ols(eqn, data=d)
             mod_ownshock = smf.ols(eqn_ownshock, data=d)  # own-shock model
-            est = mod.fit(cov_type="HAC", cov_kwds={"maxlags": newey_lags})
+            est = mod.fit(cov_type="HAC", cov_kwds={"maxlags": nw_lags})
             est_ownshock = mod_ownshock.fit(
-                cov_type="HAC", cov_kwds={"maxlags": newey_lags}
+                cov_type="HAC", cov_kwds={"maxlags": nw_lags}
             )  # own-shock model
             beta = est.params
             beta_ownshock = est_ownshock.params  # own-shock model
@@ -810,7 +812,7 @@ def TimeSeriesLP(data, Y, response, horizon, lags, newey_lags=4, ci_width=0.95):
 # lags = integer indicating number of lags to be used in the estimation models (e.g., 4 for 4 lags)
 # newey_lags = max lags for Newey-West HAC SEs
 # ci_width = float within (0, 1) indicating the width of the confidence band (e.g., 0.95 for 95% CI)
-def TimeSeriesLPX(data, Y, X, response, horizon, lags, newey_lags=4, ci_width=0.95):
+def TimeSeriesLPX(data, Y, X, response, horizon, lags, newey_lags="horizon", ci_width=0.95):
     ## Illegal inputs
     if (ci_width >= 1) | (ci_width <= 0):
         raise NotImplementedError("CI Width must be within (0, 1), non-inclusive!")
@@ -842,6 +844,7 @@ def TimeSeriesLPX(data, Y, X, response, horizon, lags, newey_lags=4, ci_width=0.
         r_loc = Y.index(r)
         ## Generate copy of data for horizon h + first difference RHS variables + transform response variable to desired horizon
         for h in range(horizon + 1):
+            nw_lags = h if newey_lags == "horizon" else newey_lags
             d = data.copy()
             d[r + "forward"] = d[r].shift(-h) - d[r].shift(
                 1
@@ -891,9 +894,9 @@ def TimeSeriesLPX(data, Y, X, response, horizon, lags, newey_lags=4, ci_width=0.
             )  # own-shock model includes contemp first diff dependent
             mod = smf.ols(eqn, data=d)
             mod_ownshock = smf.ols(eqn_ownshock, data=d)  # own-shock model
-            est = mod.fit(cov_type="HAC", cov_kwds={"maxlags": newey_lags})
+            est = mod.fit(cov_type="HAC", cov_kwds={"maxlags": nw_lags})
             est_ownshock = mod_ownshock.fit(
-                cov_type="HAC", cov_kwds={"maxlags": newey_lags}
+                cov_type="HAC", cov_kwds={"maxlags": nw_lags}
             )  # own-shock model
             beta = est.params
             beta_ownshock = est_ownshock.params  # own-shock model
